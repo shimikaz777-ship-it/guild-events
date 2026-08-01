@@ -4,8 +4,8 @@ import { formatEventDate, isPast } from "@/lib/format";
 import { isSupabaseConfigured } from "@/lib/supabase";
 import ModeBanner from "@/components/ModeBanner";
 
-// イベント一覧ページ（/）
-export default async function EventListPage() {
+// イベント一覧ページ（STEP 5: 画面①）
+export default async function HomePage() {
   const events = await getEvents();
 
   return (
@@ -19,37 +19,49 @@ export default async function EventListPage() {
         </p>
       </div>
 
-      <ul className="space-y-3">
-        {events.map((event) => {
-          const past = isPast(event.event_date);
-          return (
-            <li key={event.id}>
-              <Link
-                href={`/events/${event.id}`}
-                className="block rounded-xl border border-black/5 bg-white p-5 shadow-sm transition hover:border-guild-navy/20 hover:shadow-md"
-              >
-                <span className="inline-block rounded-full bg-guild-gold/15 px-3 py-1 text-sm font-medium text-guild-gold">
-                  {formatEventDate(event.event_date)}
-                  {past && "（終了）"}
-                </span>
-                <h2 className="mt-2 text-xl font-bold text-guild-navy">
-                  {event.title}
-                </h2>
-                {event.location && (
-                  <p className="mt-1 text-sm text-foreground/60">
-                    📍 {event.location}
-                  </p>
-                )}
-                {event.description && (
-                  <p className="mt-2 text-sm text-foreground/80">
-                    {event.description}
-                  </p>
-                )}
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
+      {events.length === 0 ? (
+        <p className="rounded-lg border border-dashed border-black/10 bg-white p-8 text-center text-foreground/50">
+          イベントがまだありません。
+        </p>
+      ) : (
+        <ul className="grid gap-4 sm:grid-cols-2">
+          {events.map((event) => {
+            const past = isPast(event.event_date);
+            return (
+              <li key={event.id}>
+                <Link
+                  href={`/events/${event.id}`}
+                  className={`block h-full rounded-xl border border-black/5 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${
+                    past ? "opacity-60" : ""
+                  }`}
+                >
+                  <div className="mb-2 flex items-center gap-2">
+                    <span className="inline-block rounded-full bg-guild-gold/15 px-2.5 py-0.5 text-xs font-medium text-guild-gold">
+                      {formatEventDate(event.event_date)}
+                    </span>
+                    {past && (
+                      <span className="text-xs text-foreground/40">終了</span>
+                    )}
+                  </div>
+                  <h2 className="text-lg font-bold text-guild-navy">
+                    {event.title}
+                  </h2>
+                  {event.location && (
+                    <p className="mt-1 text-sm text-foreground/60">
+                      📍 {event.location}
+                    </p>
+                  )}
+                  {event.description && (
+                    <p className="mt-2 line-clamp-2 text-sm text-foreground/70">
+                      {event.description}
+                    </p>
+                  )}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </div>
   );
 }
